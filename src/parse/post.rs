@@ -10,6 +10,18 @@ pub struct PostCard {
     author: Option<Author>,
     #[html(selector = "div.card--body > p", attr = "inner")]
     body: Option<UntrimmedString>,
+    #[html(selector = "div.ch--avatar--badge--wrapper > img", attr = "src")]
+    badge: Option<UntrimmedString>,
+    #[html(
+        selector = "span.card-meta--row span.post--timestamp",
+        attr = "inner"
+    )]
+    timestamp: Option<UntrimmedString>,
+    #[html(
+        selector = "div.eb--timestamp span.reblock",
+        attr = "inner"
+    )]
+    echo_timestamp: Option<UntrimmedString>,
     #[html(
         selector = "span.card-meta--row span.impressions--wrapper span.impressions--count",
         attr = "inner"
@@ -24,7 +36,7 @@ pub struct PostCard {
 #[html(selector = "div.post--card--wrapper")]
 pub struct ParlerPost {
     #[html(
-        selector = "div.card--post-container span.post,div.card--post-container span.echo--parent, div.card--post-container span.echo--root"
+        selector = "div.card--post-container span.post,div.card--post-container span.echo--parent, div.card--post-container span.echo--root, div.card--post-container div.echo-byline--wrapper"
     )]
     cards: Vec<PostCard>,
     #[html(selector = "div.comments-list--container")]
@@ -63,14 +75,8 @@ impl FromHtml for PostCardType {
             Ok(PostCardType::EchoParent)
         } else if elem.has_class("echo--root", CaseSensitivity::AsciiCaseInsensitive) {
             Ok(PostCardType::EchoRoot)
-        } else if elem.has_class("post", CaseSensitivity::AsciiCaseInsensitive) {
-            Ok(PostCardType::Post)
         } else {
-            unhtml::Result::Err(unhtml::Error::TextParseError {
-                text: elem.attr("class").unwrap_or_default().to_string(),
-                type_name: "PostCardType".to_string(),
-                err: "must have one of these classes: echo--root,echo--parent,post".to_string(),
-            })
+            Ok(PostCardType::Post)
         }
     }
 }
@@ -101,4 +107,3 @@ pub struct Comment {
     #[html(selector = "div.card--body p", attr = "inner")]
     body: Option<String>,
 }
-
